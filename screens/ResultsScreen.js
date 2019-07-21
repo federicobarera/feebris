@@ -1,10 +1,12 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text } from 'react-native';
 import symptoms_eval from '../modules/sympthoms-evaluator';
 import tracker from '../modules/sympthoms-tracker';
 
+import styles from './styles'
+
 export default function LinksScreen({ navigation }) {
-  
+
   const [fluState, changeFluState] = useState({ loading: true, hasFlu: false });
   const [trackingState, changeTrackingState] = useState({ sending: false });
   const [cough, temp, fever] = ['cough', 'temp', 'fever'].map(navigation.getParam);
@@ -22,35 +24,38 @@ export default function LinksScreen({ navigation }) {
   return (
     <Fragment>
       <SafeAreaView>
-
-        <View style={styles.container}>
-          <View style={styles.sectionContainer}>
-            {fluState.loading &&
-              <Text >Evaluating symphtoms...</Text>
-            }
-            {!fluState.loading &&
-              <Text>
-                {fluState.hasFlu
-                  ? 'You have flu'
-                  : 'You don\'t have flu'
-                }
-              </Text>
-            }
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollView}>
+          <View style={styles.body}>
+            <View style={styles.sectionContainer}>
+              {fluState.loading &&
+                <Text style={styles.sectionTitle}>Evaluating symptoms...</Text>
+              }
+              {!fluState.loading &&
+                <Text style={styles.sectionTitle}>
+                  {fluState.hasFlu
+                    ? 'You have flu.'
+                    : 'You don\'t have flu.'
+                  }
+                </Text>
+              }
+            </View>
+            <View style={styles.sectionContainer}>
+              {trackingState.sending &&
+                <Text style={styles.sectionTitle}>Sending results for further analysis...</Text>
+              }
+              {!trackingState.sending &&
+                <Text style={styles.sectionTitle}>
+                  {trackingState.success
+                    ? 'Results sent successfully.'
+                    : 'Failed to send results... we should really implement a queue processor.'
+                  }
+                </Text>
+              }
+            </View>
           </View>
-          <View style={styles.sectionContainer}>
-            {trackingState.sending &&
-              <Text >Sending Results for further analysis...</Text>
-            }
-            {!trackingState.sending &&
-              <Text>
-                {trackingState.success
-                  ? 'Results sents successfully'
-                  : 'Failed to send results... we should really implement a queue processor'
-                }
-              </Text>
-            }
-          </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </Fragment>
   );
@@ -59,15 +64,3 @@ export default function LinksScreen({ navigation }) {
 LinksScreen.navigationOptions = {
   title: 'Results',
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 15,
-    backgroundColor: '#fff',
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-});
